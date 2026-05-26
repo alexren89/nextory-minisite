@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "Bash(git -C /Users/alexander/Documents/Twigeo/Nextory/Minisite status)",
+      "Bash(git -C /Users/alexander/Documents/Twigeo/Nextory/Minisite init -b main)",
+      "Bash(git -C /Users/alexander/Documents/Twigeo/Nextory/Minisite add .)",
+      "Bash(git -C /Users/alexander/Documents/Twigeo/Nextory/Minisite commit -m \"Initial commit: Nextory ads minisite\")"
+    ]
+  }
+}
