@@ -214,7 +214,7 @@
       <div class="player" id="player-wrap">
         <iframe
           id="player"
-          src="https://player.vimeo.com/video/1115813071?controls=0&title=0&byline=0&portrait=0&dnt=1"
+          src="https://player.vimeo.com/video/1115813071?controls=1&title=0&byline=0&portrait=0&dnt=1"
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
         ></iframe>
@@ -232,31 +232,24 @@
       const playerWrap = document.getElementById("player-wrap");
       const overlay = document.getElementById("play-overlay");
 
-      const idleUrl = (id) =>
-        `https://player.vimeo.com/video/${id}?controls=0&title=0&byline=0&portrait=0&dnt=1`;
-      const playUrl = (id) =>
-        `https://player.vimeo.com/video/${id}?controls=1&autoplay=1&title=0&byline=0&portrait=0&dnt=1`;
-
-      const currentId = () =>
-        document.querySelector('.tab[aria-selected="true"]').dataset.id;
+      const buildUrl = (id) =>
+        `https://player.vimeo.com/video/${id}?controls=1&title=0&byline=0&portrait=0&dnt=1`;
 
       let player = new Vimeo.Player(iframe);
 
       function bindPlayerEvents() {
         player.on("ended", () => {
-          iframe.src = idleUrl(currentId());
-          player = new Vimeo.Player(iframe);
-          bindPlayerEvents();
           playerWrap.classList.remove("is-active");
+          player.setCurrentTime(0).catch(() => {});
         });
       }
       bindPlayerEvents();
 
       overlay.addEventListener("click", () => {
-        iframe.src = playUrl(currentId());
-        player = new Vimeo.Player(iframe);
-        bindPlayerEvents();
         playerWrap.classList.add("is-active");
+        player.setMuted(false).catch(() => {});
+        player.setVolume(1).catch(() => {});
+        player.play().catch(() => {});
       });
 
       tabs.forEach((tab) => {
@@ -266,7 +259,7 @@
           tabs.forEach((t) => t.setAttribute("aria-selected", "false"));
           tab.setAttribute("aria-selected", "true");
 
-          iframe.src = idleUrl(tab.dataset.id);
+          iframe.src = buildUrl(tab.dataset.id);
           player = new Vimeo.Player(iframe);
           bindPlayerEvents();
           playerWrap.classList.remove("is-active");
