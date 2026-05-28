@@ -54,6 +54,20 @@
         background: #000;
       }
 
+      .poster {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .player.is-active .poster {
+        opacity: 0;
+      }
+
       .play-overlay {
         appearance: none;
         border: 0;
@@ -65,6 +79,7 @@
         cursor: pointer;
         background: rgba(0, 0, 0, 0.15);
         transition: opacity 0.25s ease;
+        z-index: 2;
       }
       .play-overlay:focus {
         outline: none;
@@ -96,10 +111,15 @@
     <div class="player" id="player-wrap">
       <iframe
         id="player"
-        src="https://player.vimeo.com/video/1115813071?controls=0&title=0&byline=0&portrait=0&dnt=1"
+        src="https://player.vimeo.com/video/1115813071?controls=1&title=0&byline=0&portrait=0&dnt=1"
         allow="autoplay; fullscreen; picture-in-picture"
         allowfullscreen
       ></iframe>
+      <img
+        class="poster"
+        src="https://vumbnail.com/1115813071.jpg"
+        alt=""
+      />
       <button class="play-overlay" id="play-overlay" aria-label="Play video">
         <span class="play-button" aria-hidden="true"></span>
       </button>
@@ -111,34 +131,21 @@
       const playerWrap = document.getElementById("player-wrap");
       const overlay = document.getElementById("play-overlay");
 
-      const VIDEO_ID = "1115813071";
-      const idleUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=0&title=0&byline=0&portrait=0&dnt=1`;
-      const playUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=1&autoplay=1&muted=0&title=0&byline=0&portrait=0&dnt=1`;
+      const player = new Vimeo.Player(iframe);
 
-      let player = new Vimeo.Player(iframe);
+      player.ready().then(() => {
+        player.setVolume(1).catch(() => {});
+        player.setMuted(false).catch(() => {});
+      });
 
-      function bindEnded() {
-        player.on("ended", () => {
-          iframe.src = idleUrl;
-          player = new Vimeo.Player(iframe);
-          bindEnded();
-          playerWrap.classList.remove("is-active");
-        });
-      }
-      bindEnded();
+      player.on("ended", () => {
+        playerWrap.classList.remove("is-active");
+        player.setCurrentTime(0).catch(() => {});
+      });
 
       overlay.addEventListener("click", () => {
-        iframe.src = playUrl;
-        player = new Vimeo.Player(iframe);
-        bindEnded();
-        player
-          .ready()
-          .then(() => {
-            player.setVolume(1).catch(() => {});
-            player.setMuted(false).catch(() => {});
-          })
-          .catch(() => {});
         playerWrap.classList.add("is-active");
+        player.play().catch(() => {});
       });
     </script>
   </body>
