@@ -96,7 +96,7 @@
     <div class="player" id="player-wrap">
       <iframe
         id="player"
-        src="https://player.vimeo.com/video/1115813071?controls=1&title=0&byline=0&portrait=0&dnt=1"
+        src="https://player.vimeo.com/video/1115813071?controls=0&title=0&byline=0&portrait=0&dnt=1"
         allow="autoplay; fullscreen; picture-in-picture"
         allowfullscreen
       ></iframe>
@@ -111,18 +111,31 @@
       const playerWrap = document.getElementById("player-wrap");
       const overlay = document.getElementById("play-overlay");
 
-      const player = new Vimeo.Player(iframe);
+      const VIDEO_ID = "1115813071";
+      const idleUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=0&title=0&byline=0&portrait=0&dnt=1`;
+      const playUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=1&title=0&byline=0&portrait=0&dnt=1`;
 
-      player.on("ended", () => {
-        playerWrap.classList.remove("is-active");
-        player.setCurrentTime(0).catch(() => {});
-      });
+      let player = new Vimeo.Player(iframe);
+
+      function bindEnded() {
+        player.on("ended", () => {
+          iframe.src = idleUrl;
+          player = new Vimeo.Player(iframe);
+          bindEnded();
+          playerWrap.classList.remove("is-active");
+        });
+      }
+      bindEnded();
 
       overlay.addEventListener("click", () => {
+        iframe.src = playUrl;
+        player = new Vimeo.Player(iframe);
+        bindEnded();
+        player
+          .ready()
+          .then(() => player.play())
+          .catch(() => {});
         playerWrap.classList.add("is-active");
-        player.setMuted(false).catch(() => {});
-        player.setVolume(1).catch(() => {});
-        player.play().catch(() => {});
       });
     </script>
   </body>
