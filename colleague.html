@@ -113,7 +113,7 @@
 
       const VIDEO_ID = "1115813071";
       const idleUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=0&title=0&byline=0&portrait=0&dnt=1`;
-      const playUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=1&title=0&byline=0&portrait=0&dnt=1`;
+      const playUrl = `https://player.vimeo.com/video/${VIDEO_ID}?controls=1&autoplay=1&muted=0&title=0&byline=0&portrait=0&dnt=1`;
 
       let player = new Vimeo.Player(iframe);
 
@@ -133,7 +133,10 @@
         bindEnded();
         player
           .ready()
-          .then(() => player.play())
+          .then(() => {
+            player.setVolume(1).catch(() => {});
+            player.setMuted(false).catch(() => {});
+          })
           .catch(() => {});
         playerWrap.classList.add("is-active");
       });
